@@ -1,0 +1,28 @@
+start
+	: definition* EOF
+	;
+	
+definition
+	: variable
+	| struct
+	| func
+	;
+	
+variable
+	:'var' IDENT ';' tipo ';'
+	;
+
+tipo: 'int'
+	|'float'
+	|'char'
+	|IDENT
+	|'[' INT_CONSTANT ']' tipo
+	
+
+
+Consejos Raul:
+	- Solo sintactico
+	- Pasar el ejemplo poco a poco al analizador
+	- Ejemplo txt e hipoteca son correctos sintacticamente
+	- Capitulo 0 como raiz del proyecto
+	- tutorial: www.di.uniovi.es/~ric

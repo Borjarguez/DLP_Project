@@ -1,0 +1,42 @@
+CATEGORIES
+expression,sentence, type, definition
+
+NODES
+program -> definitions: definition*;
+defVariable:definition -> name:string type:type;
+defStruct:definition -> name:varType param:structField*;
+structField:definition -> name:string type:type;
+defFunc:definition -> name:string args:defVariable* returnType:type definitions:defVariable* sentences:sentence*;
+
+intType:type -> ;
+realType:type -> ;
+charType:type -> ;
+varType:type -> name:string;
+arrayType:type -> size:intConstant type:type;
+errorType:type -> ;
+voidType:type -> ;
+
+assignment:sentence -> left:expression right:expression;
+ifElse:sentence -> expression if_sent:sentence* else_sent:sentence*;
+while:sentence -> param:expression sentence*;
+return:sentence -> expression;
+read:sentence -> expression;
+print:sentence -> expression;
+println:sentence -> expression;
+printsp:sentence -> expression;
+funcSentence:sentence -> name:string args:expression*;
+
+intConstant:expression -> value:string ;
+realConstant:expression -> value:string ;
+charConstant:expression -> value:string ;
+variable:expression -> value:string ;
+voidConstant:expression -> ;
+arrayCall:expression -> index:expression expr:expression;
+fieldAccess:expression -> expression name:string;
+arithmeticExpr:expression -> left:expression operator:string right:expression;
+comparationExpr:expression -> left:expression operator:string right:expression;
+logicExpr:expression -> left:expression operator:string right:expression;
+negationExpr:expression -> operator:string expression;
+castExpr:expression -> type:type expression;
+funcExpr:expression -> name:string args:expression*;
+voidExpr:expression -> ;
