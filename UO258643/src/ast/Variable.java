@@ -8,7 +8,6 @@ import org.antlr.v4.runtime.*;
 import visitor.*;
 
 //	variable:expression -> value:String
-
 public class Variable extends AbstractExpression {
 
     private String name;

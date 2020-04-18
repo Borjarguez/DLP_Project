@@ -11,7 +11,6 @@ import org.antlr.v4.runtime.*;
 import visitor.*;
 
 //	varType:type -> name:String
-
 public class VarType extends AbstractType {
 
     private String name;
@@ -72,5 +71,10 @@ public class VarType extends AbstractType {
             size += param.getType().getMemorySize();
 
         return size;
+    }
+
+    @Override
+    public String getMAPLName(){
+        return name;
     }
 }

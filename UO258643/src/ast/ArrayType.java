@@ -64,14 +64,7 @@ public class ArrayType extends AbstractType {
     }
 
     @Override
-    public char getSuffix() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
     public String getMAPLName() {
-        // TODO Auto-generated method stub
-        return null;
+        return size.getValue() + " * " + type.getMAPLName();
     }
 }

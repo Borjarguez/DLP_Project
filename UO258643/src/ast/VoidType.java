@@ -7,7 +7,6 @@ package ast;
 import visitor.*;
 
 //	voidType:type ->
-
 public class VoidType extends AbstractType {
 
     @Override
@@ -23,4 +22,9 @@ public class VoidType extends AbstractType {
     public int getMemorySize() {
         return 0;
     }
+
+    @Override
+	public String getMAPLName() {
+		return "void";
+	}
 }
