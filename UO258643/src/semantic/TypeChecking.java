@@ -74,7 +74,7 @@ public class TypeChecking extends DefaultVisitor {
     public Object visit(IfElse node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
-        // TODO
+        
         // Primera comprobación: el tipo de la condición debe ser un entero
         predicado(mismoTipo(node.getExpression().getType(), IntType.class),
                 "ERROR: El tipo de la condición debe ser un entero", node);
@@ -170,7 +170,7 @@ public class TypeChecking extends DefaultVisitor {
             predicado(tipoRetornable.contains(node.getReturnType().getClass()), "ERROR: Retorno de tipo no simple",
                     node);
 
-            // Segunda comprobación: el tipo de retorno existe pero no la cláusula return
+            // Segunda comprobación: el tipo de retorno es void pero existe cláusula return
             List<Sentence> returns = node.getSentences().stream()
                     .filter(sentence -> sentence.getClass() == Return.class).collect(Collectors.toList());
 
@@ -181,9 +181,19 @@ public class TypeChecking extends DefaultVisitor {
             //if (node.getReturnType().getClass() != VoidType.class)
             returns.forEach(ret -> predicado(mismoTipo(node.getReturnType(), ret.getClass()),
                     "ERROR: los tipos de retorno de la funcion y return no coinciden " + node.getReturnType(), node));
+
         } else {
             predicado(node.getReturnType().getClass() == VoidType.class,
                     "ERROR: La función main no debe de tener returns", node);
+        }
+
+        // Cuarta comprobación: si existe IfElse, comprobar si debe retornar algo o no
+        List<Sentence> ifElses = node.getSentences().parallelStream().filter(x -> x.getClass() == IfElse.class).collect(Collectors.toList());
+        List<Sentence> if_sents;
+        if(ifElses != null && ifElses.size() > 0){
+            for(IfElse sent: ifElses){
+                if_sents = sent.getIf_sent();
+            }
         }
 
         return null;

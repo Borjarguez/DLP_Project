@@ -1,0 +1,2 @@
+#source "TestGestionMemoria.txt"
+halt
