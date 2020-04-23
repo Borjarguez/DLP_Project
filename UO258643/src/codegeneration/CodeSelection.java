@@ -44,13 +44,35 @@ public class CodeSelection extends DefaultVisitor {
 
     public Object visit(Program node, Object param) {
         out("#source \"" + sourceFile + "\"");
-        visitChildren(node.getDefinitions(), param);
+        out("call main");
         out("halt");
+        writer.println();
 
-        super.visit(node, param); // Recorrer los hijos
+        visitChildren(node.getDefinitions(), param);
         return null;
     }
 
+    //	class VarDefinition { String name;  Type type; }
+    public Object visit(DefVariable node, Object param) {
+        out("#" + node.getScope().toString() + " " + node.getName() + ":" + node.getType().getMAPLName());
+        return null;
+    }
+
+    // class Variable { String name; }
+    public Object visit(Variable node, Object param) {
+        if (((CodeFunction) param) == CodeFunction.VALUE) {
+            visit(node, CodeFunction.ADDRESS);
+            out("load", node.getType());
+        } else { // Funcion.DIRECCION
+            assert (param == CodeFunction.ADDRESS);
+            out("pusha " + node.getDefinition().getAddress());
+        }
+        return null;
+    }
+
+    // # SENTECES
+
+    //	class Assignment { Expression left;  Expression right; }
     public Object visit(Assignment node, Object param) {
         line(node);
         node.getLeft().accept(this, CodeFunction.ADDRESS);
@@ -59,11 +81,63 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
+    //	class IfElse { Expression expression;  List<Sentence> if_sent;  List<Sentence> else_sent; }
+    public Object visit(IfElse node, Object param) {
+        // TODO
+        return null;
+    }
+
+    //	class While { Expression param;  List<Sentence> sentence; }
+    public Object visit(While node, Object param) {
+        // TODO
+        return null;
+    }
+
+    //	class Return { Expression expression; }
+    public Object visit(Return node, Object param) {
+        // TODO
+        return null;
+    }
+
+    //	class Read { Expression expression; }
+    public Object visit(Read node, Object param) {
+        line(node);
+        super.visit(node, CodeFunction.ADDRESS);
+
+        out("in", node.getDefFunc().getReturnType());
+        out("store", node.getDefFunc().getReturnType());
+
+        writer.println();
+        return null;
+    }
+
     // class Print { Expression expression; }
     public Object visit(Print node, Object param) {
         line(node);
         node.getExpression().accept(this, CodeFunction.VALUE);
         out("out", node.getExpression().getType());
+        return null;
+    }
+
+    //	class Println { Expression expression; }
+    public Object visit(Println node, Object param) {
+        line(node);
+        node.getExpression().accept(this, CodeFunction.VALUE);
+        out("out", node.getExpression().getType());
+        return null;
+    }
+
+    //	class Printsp { Expression expression; }
+    public Object visit(Printsp node, Object param) {
+        line(node);
+        node.getExpression().accept(this, CodeFunction.VALUE);
+        out("out", node.getExpression().getType());
+        return null;
+    }
+
+    //	class FuncSentence { String name;  List<Expression> args; }
+    public Object visit(FuncSentence node, Object param) {
+        // TODO
         return null;
     }
 
