@@ -74,7 +74,7 @@ public class TypeChecking extends DefaultVisitor {
     public Object visit(IfElse node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
-        
+
         // Primera comprobación: el tipo de la condición debe ser un entero
         predicado(mismoTipo(node.getExpression().getType(), IntType.class),
                 "ERROR: El tipo de la condición debe ser un entero", node);
@@ -188,14 +188,13 @@ public class TypeChecking extends DefaultVisitor {
         }
 
         // Cuarta comprobación: si existe IfElse, comprobar si debe retornar algo o no
-        List<Sentence> ifElses = node.getSentences().parallelStream().filter(x -> x.getClass() == IfElse.class).collect(Collectors.toList());
-        List<Sentence> if_sents;
-        if(ifElses != null && ifElses.size() > 0){
-            for(IfElse sent: ifElses){
-                if_sents = sent.getIf_sent();
-            }
-        }
-
+        // List<Sentence> ifElses = node.getSentences().parallelStream().filter(x -> x.getClass() == IfElse.class).collect(Collectors.toList());
+        //List<Sentence> if_sents;
+        //if(ifElses != null && ifElses.size() > 0){
+        //   for(IfElse sent: ifElses){
+        //      if_sents = sent.getIf_sent();
+        // }
+        // }
         return null;
     }
 

@@ -39,6 +39,7 @@ public class CodeSelection extends DefaultVisitor {
         logicalInstruction.put("!=", "ne");
         logicalInstruction.put("&&", "and");
         logicalInstruction.put("||", "or");
+        logicalInstruction.put("!", "not");
     }
 
     public Object visit(Program node, Object param) {
@@ -93,6 +94,64 @@ public class CodeSelection extends DefaultVisitor {
         node.getLeft().accept(this, CodeFunction.VALUE);
         node.getRight().accept(this, CodeFunction.VALUE);
         out(logicalInstruction.get(node.getOperator()), node.getType());
+        return null;
+    }
+
+    //	class NegationExpr { String operator;  Expression expression; }
+    public Object visit(NegationExpr node, Object param) {
+        assert (param == CodeFunction.VALUE);
+        node.getExpression().accept(this, CodeFunction.VALUE);
+        out(logicalInstruction.get(node.getOperator()));
+        return null;
+    }
+
+    //	class CastExpr { Type type;  Expression expression; }
+    public Object visit(CastExpr node, Object param) {
+        assert (param == CodeFunction.VALUE);
+        node.getExpression().accept(this, CodeFunction.VALUE);
+        // TODO Corregir, creo q hay un caso excepcional con los enteros
+        out(node.getExpression().getType().getSuffix() + "2" + node.getType().getSuffix());
+        return null;
+    }
+
+    //	class FieldAccess { Expression expression;  String name; }
+    public Object visit(FieldAccess node, Object param) {
+        if (param == CodeFunction.VALUE) {
+            visit(node, CodeFunction.ADDRESS);
+            out("load", node.getType());
+        } else {
+            if (param == CodeFunction.ADDRESS) {
+                node.getExpression().accept(this, param);
+                VarType definition = (VarType) node.getExpression().getType();
+                out("push " + definition.findParam(node.getName()).getAddress());
+                out(arithmethicInstruction.get("+"));
+            }
+        }
+        return null;
+    }
+
+    //	class ArrayCall { Expression index;  Expression expr; }
+    public Object visit(ArrayCall node, Object param) {
+        if (param == CodeFunction.VALUE) {
+            visit(node, CodeFunction.ADDRESS);
+            out("load", node.getTipoArray());
+        } else {
+            if (param == CodeFunction.ADDRESS) {
+                node.getExpr().accept(this, param);
+                node.getIndex().accept(this, CodeFunction.VALUE);
+                out("push " + node.getType().getMemorySize());
+                out(arithmethicInstruction.get("*"));
+                out(arithmethicInstruction.get("+"));
+            }
+        }
+        return null;
+    }
+
+    //	class FuncExpr { String name;  List<Expression> args; }
+    public Object visit(FuncExpr node, Object param) {
+        for (Expression expr : node.getArgs())
+            expr.accept(this, param);
+        out("call " + node.getName());
         return null;
     }
 
