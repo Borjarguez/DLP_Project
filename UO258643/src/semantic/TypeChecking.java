@@ -13,8 +13,6 @@ import visitor.DefaultVisitor;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class TypeChecking extends DefaultVisitor {
 
@@ -27,7 +25,62 @@ public class TypeChecking extends DefaultVisitor {
         this.errorManager = errorManager;
     }
 
-    // class Assignment { Expression left; Expression right; }
+    //# class DefVariable { String name; Type type; }
+    public Object visit(DefVariable node, Object param) {
+        super.visit(node, param);
+
+        if (node.getScope().equals(VarScope.PARAM))
+            predicado(esTipoSimple(node.getType()), "ERROR: El parámetro de la función no es tipo simple", node);
+
+        return null;
+    }
+
+    //# class DefFunc { String name; List<DefVariable> params; Type returnType;
+    //# List<DefVariable> definitions; List<Sentence> sentences; }
+    public Object visit(DefFunc node, Object param) {
+        super.visit(node, param);
+
+        // Comprobacion de los parametros
+        predicado(tipoRetornable.contains(node.getReturnType().getClass()), "ERROR: Retorno de tipo no simple", node);
+
+        // Segunda comprobación: el return no debe tener expresión en funciones void
+        if (!(node.getReturnType() instanceof VoidType)) {
+            predicado(node.hasReturn(), "ERROR: La función debe tener retorno", node);
+        }
+
+        return null;
+    }
+
+    //# class IntConstant { String valor; }
+    public Object visit(IntConstant node, Object param) {
+        node.setType(new IntType());
+        node.setModificable(false);
+        return null;
+    }
+
+    //# class RealConstant { String valor; }
+    public Object visit(RealConstant node, Object param) {
+        node.setType(new RealType());
+        node.setModificable(false);
+        return null;
+    }
+
+    //#	class CharConstant { String value; }
+    public Object visit(CharConstant node, Object param) {
+        node.setType(new CharType());
+        node.setModificable(false);
+
+        return null;
+    }
+
+    //# class VoidConstant { }
+    public Object visit(VoidConstant node, Object param) {
+        node.setType(new VoidType());
+        node.setModificable(false);
+        return null;
+    }
+
+    //# class Assignment { Expression left; Expression right; }
     public Object visit(Assignment node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -46,7 +99,47 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //	class FuncExpr { String name;  List<Expression> args; }
+    //#	class IfElse { Expression expression;  List<Sentence> if_sent;  List<Sentence> else_sent; }
+    public Object visit(IfElse node, Object param) {
+        // Recorrido de los hijos
+        super.visit(node, param);
+
+        // Primera comprobación: el tipo de la condición debe ser un entero
+        predicado(mismoTipo(node.getExpression().getType(), IntType.class),
+                "ERROR: El tipo de la condición debe ser un entero", node);
+
+        return null;
+    }
+
+    //#	class While { Expression param;  List<Sentence> sentence; }
+    public Object visit(While node, Object param) {
+        // Recorrido de los hijos
+        super.visit(node, param);
+
+        // Primera comprobación: la condición evaluada debe ser de tipo entero
+        predicado(mismoTipo(node.getParam().getType(), IntType.class),
+                "ERROR: la condición evaluada debe ser de tipo entero", node);
+
+        return null;
+    }
+
+    //# class Return { Expression expression; }
+    public Object visit(Return node, Object param) {
+        // Recorrido de los hijos
+        super.visit(node, param);
+
+        // Primera comprobación: la expresión de retorno debe ser de tipo retornable
+        predicado(tipoRetornable.contains(node.getExpression().getType().getClass()),
+                "ERROR: la expresion de retorno debe ser de tipo retornable", node);
+
+        // Segunda comparación: la expresion debe de ser del mismo tipo que el retorno
+        predicado(mismoTipo(node.getDefFunc().getReturnType(), node.getExpression().getType().getClass()),
+                "ERROR: La expresion de retorno debe de ser del tipo de retorno de la función", node);
+
+        return null;
+    }
+
+    //#	class FuncExpr { String name;  List<Expression> args; }
     public Object visit(FuncExpr node, Object param) {
         super.visit(node, param);
 
@@ -70,43 +163,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //	class IfElse { Expression expression;  List<Sentence> if_sent;  List<Sentence> else_sent; }
-    public Object visit(IfElse node, Object param) {
-        // Recorrido de los hijos
-        super.visit(node, param);
-
-        // Primera comprobación: el tipo de la condición debe ser un entero
-        predicado(mismoTipo(node.getExpression().getType(), IntType.class),
-                "ERROR: El tipo de la condición debe ser un entero", node);
-
-        return null;
-    }
-
-    //	class While { Expression param;  List<Sentence> sentence; }
-    public Object visit(While node, Object param) {
-        // Recorrido de los hijos
-        super.visit(node, param);
-
-        // Primera comprobación: la condición evaluada debe ser de tipo entero
-        predicado(mismoTipo(node.getParam().getType(), IntType.class),
-                "ERROR: la condición evaluada debe ser de tipo entero", node);
-
-        return null;
-    }
-
-    //	class Return { Expression expression; }
-    public Object visit(Return node, Object param) {
-        // Recorrido de los hijos
-        super.visit(node, param);
-
-        // Primera comprobación: la expresión de retorno debe ser de tipo retornable
-        predicado(tipoRetornable.contains(node.getExpression().getType().getClass()),
-                "ERROR: la expresion de retorno debe ser de tipo retornable", node);
-
-        return null;
-    }
-
-    //	class Read { Expression expression; }
+    //#	class Read { Expression expression; }
     public Object visit(Read node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -122,7 +179,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //	class Print { Expression expression; }
+    //# class Print { Expression expression; }
     public Object visit(Print node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -130,10 +187,11 @@ public class TypeChecking extends DefaultVisitor {
         // Primera comprobación: la expresion que se quiere leer debe ser de tipo simple
         predicado(tipoSimple.contains(node.getExpression().getType().getClass()),
                 "ERROR: la expresion que se quiere imprimir debe ser de tipo simple", node);
+
         return null;
     }
 
-    //	class Println { Expression expression; }
+    //# class Println { Expression expression; }
     public Object visit(Println node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -145,7 +203,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //	class Printsp { Expression expression; }
+    //# class Printsp { Expression expression; }
     public Object visit(Printsp node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -157,48 +215,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    // class DefFunc { String name; List<DefVariable> params; Type returnType;
-    // List<DefVariable> definitions; List<Sentence> sentences; }
-    public Object visit(DefFunc node, Object param) {
-        super.visit(node, param);
-
-        // Comprobacion de los parametros
-        node.getParams().forEach(
-                p -> predicado(esTipoSimple(p.getType()), "ERROR: Los parámetros deben de ser tipos primitivos", node));
-
-        if (!node.getName().equals("main")) {
-            predicado(tipoRetornable.contains(node.getReturnType().getClass()), "ERROR: Retorno de tipo no simple",
-                    node);
-
-            // Segunda comprobación: el tipo de retorno es void pero existe cláusula return
-            List<Sentence> returns = node.getSentences().stream()
-                    .filter(sentence -> sentence.getClass() == Return.class).collect(Collectors.toList());
-
-            predicado(node.getReturnType().getClass() != VoidType.class || returns.size() == 0,
-                    "ERROR: El return no debe tener expresión en funciones void", node);
-
-            // Tercera comprobación: el tipo del return y el de la funcion no coincide
-            //if (node.getReturnType().getClass() != VoidType.class)
-            returns.forEach(ret -> predicado(mismoTipo(node.getReturnType(), ret.getClass()),
-                    "ERROR: los tipos de retorno de la funcion y return no coinciden " + node.getReturnType(), node));
-
-        } else {
-            predicado(node.getReturnType().getClass() == VoidType.class,
-                    "ERROR: La función main no debe de tener returns", node);
-        }
-
-        // Cuarta comprobación: si existe IfElse, comprobar si debe retornar algo o no
-        // List<Sentence> ifElses = node.getSentences().parallelStream().filter(x -> x.getClass() == IfElse.class).collect(Collectors.toList());
-        //List<Sentence> if_sents;
-        //if(ifElses != null && ifElses.size() > 0){
-        //   for(IfElse sent: ifElses){
-        //      if_sents = sent.getIf_sent();
-        // }
-        // }
-        return null;
-    }
-
-    // class FuncSentence { String name; List<Expression> args; }
+    //# class FuncSentence { String name; List<Expression> args; }
     public Object visit(FuncSentence node, Object param) {
         super.visit(node, param);
 
@@ -216,47 +233,14 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    // class DefVariable { String name; Type type; }
-    public Object visit(DefVariable node, Object param) {
-        super.visit(node, param);
-
-        if (node.getScope().equals(VarScope.PARAM))
-            predicado(esTipoSimple(node.getType()), "ERROR: El parámetro de la función no es tipo simple", node);
-
-        return null;
-    }
-
-    // class Variable { String name; }
+    //# class Variable { String name; }
     public Object visit(Variable node, Object param) {
         node.setType(node.getDefinition().getType());
         node.setModificable(true);
         return null;
     }
 
-    // class IntConstant { String valor; }
-    public Object visit(IntConstant node, Object param) {
-        node.setType(new IntType());
-        node.setModificable(false);
-        return null;
-    }
-
-    // class RealConstant { String valor; }
-    public Object visit(RealConstant node, Object param) {
-        node.setType(new RealType());
-        node.setModificable(false);
-        return null;
-    }
-
-    // class VoidConstant { }
-    public Object visit(VoidConstant node, Object param) {
-        node.setType(new VoidType());
-        node.setModificable(false);
-
-        return null;
-    }
-
-    // # Expresiones acceso a estructuras ()
-    // class FieldAccess { Expression expression; String name; }
+    //# class FieldAccess { Expression expression; String name; }
     public Object visit(FieldAccess node, Object param) {
         // Condicion de error
         boolean isErr, isErr2;
@@ -287,8 +271,7 @@ public class TypeChecking extends DefaultVisitor {
         }
     }
 
-    // # Expresiones aritméticas (suma, resta, multiplicacion y division)
-    // class ArithmeticExpr { Expression left; String operator; Expression right; }
+    //# class ArithmeticExpr { Expression left; String operator; Expression right; }
     public Object visit(ArithmeticExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -316,8 +299,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    // # Expresiones de comparación ('>' | '>=' | '<' | '<=')
-    // class ComparationExpr { Expression left; String operator; Expression right; }
+    //# class ComparationExpr { Expression left; String operator; Expression right; }
     public Object visit(ComparationExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -340,13 +322,12 @@ public class TypeChecking extends DefaultVisitor {
             return null;
         }
 
-        node.setType(node.getLeft().getType());
+        node.setType(new IntType());
         node.setModificable(false);
         return null;
     }
 
-    // # Expresiones lógicas ('==' | '!=')
-    // class LogicExpr { Expression left; String operator; Expression right; }
+    //# class LogicExpr { Expression left; String operator; Expression right; }
     public Object visit(LogicExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -374,7 +355,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    // # Expresion de negación ('!')
+    //# Expresion de negación ('!')
     // class NegationExpr { String operator; Expression expression; }
     public Object visit(NegationExpr node, Object param) {
         // Condicion de error
@@ -397,8 +378,7 @@ public class TypeChecking extends DefaultVisitor {
         }
     }
 
-    // # Expresion de cast (cast <type>)
-    // class CastExpr { Type type; Expression expression; }
+    //# class CastExpr { Type type; Expression expression; }
     public Object visit(CastExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -443,8 +423,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    // # Expresion de acceso a array (expr '[' expr ']')
-    // class ArrayCall { Expression index; Expression expr; }
+    //# class ArrayCall { Expression index; Expression expr; }
     public Object visit(ArrayCall node, Object param) {
         // Condicion de error
         boolean cond;
@@ -479,6 +458,9 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
+    // # --------------------------------------------------------
+    // # Funciones auxiliares
+
     /**
      * Method which checks if the parameter's type is simple
      *
@@ -488,9 +470,6 @@ public class TypeChecking extends DefaultVisitor {
     private boolean esTipoSimple(Type type) {
         return tipoSimple.contains(type.getClass());
     }
-
-    // #--------------------------------------------------------
-    // # Funciones auxiliares
 
     /**
      * Method which checks if the condition is false, so the program has to return
@@ -508,7 +487,6 @@ public class TypeChecking extends DefaultVisitor {
                 return true;
             }
         }
-
         return false;
     }
 

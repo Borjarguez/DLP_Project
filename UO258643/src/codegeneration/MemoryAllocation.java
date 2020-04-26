@@ -14,6 +14,8 @@ import visitor.*;
  */
 public class MemoryAllocation extends DefaultVisitor {
 
+    private int currentAddress = 0;
+
     // class Programa { List<DefVariable> definiciones; List<Sentencia> sentencias; }
     public Object visit(Program node, Object param) {
         super.visit(node, param);
@@ -43,8 +45,6 @@ public class MemoryAllocation extends DefaultVisitor {
     }
 
     public Object visit(DefVariable node, Object param) {
-        int currentAddress = 0;
-
         super.visit(node, param);
 
         if (node.getScope().equals(VarScope.GLOBAL)) {
@@ -60,7 +60,7 @@ public class MemoryAllocation extends DefaultVisitor {
             node.getReturnType().accept(this, param);
         visitChildren(node.getSentences(), param);
 
-        // visitaamos los parametros y las definiciones
+        // visitamos los parametros y las definiciones
         int bp = 4;
         for (int i = node.getParams().size() - 1; i >= 0; i--) {
             DefVariable paramFunction = node.getParams().get(i);

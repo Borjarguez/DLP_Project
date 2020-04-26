@@ -56,18 +56,16 @@ sentence returns[Sentence ast]
 	| 'return' ';'													{$ast = new Return(new VoidExpr());}
 	| 'read' expr ';'												{$ast = new Read($ctx.expr(0));}
 	| 'print' expr ';'												{$ast = new Print($ctx.expr(0));}
-	| 'print' ';'													{$ast = new Print(null);}
 	| 'printsp' expr ';'											{$ast = new Printsp($ctx.expr(0));}
-	| 'printsp' ';'													{$ast = new Printsp(null);}
 	| 'println' expr ';'											{$ast = new Println($ctx.expr(0));}
-	| 'println' ';'													{$ast = new Println(null);}
+	| 'println' ';'													{$ast = new Println(new VoidExpr());}
 	| IDENT '(' args ')' ';'										{$ast = new FuncSentence($IDENT, $args.list);}
 	;
 
 params returns[List<Definition> list = new ArrayList<Definition>()]
 	: (
-		IDENT ':' type			{$list.add(new DefVariable($IDENT, $type.ast, VarScope.LOCAL));} (
-			',' IDENT ':' type	{$list.add(new DefVariable($IDENT, $type.ast, VarScope.LOCAL));}
+		IDENT ':' type			{$list.add(new DefVariable($IDENT, $type.ast, VarScope.PARAM));} (
+			',' IDENT ':' type	{$list.add(new DefVariable($IDENT, $type.ast, VarScope.PARAM));}
 		)*
 	)?
 	;

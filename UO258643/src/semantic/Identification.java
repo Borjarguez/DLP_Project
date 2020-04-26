@@ -33,7 +33,7 @@ public class Identification extends DefaultVisitor {
 
         variables.set();
 
-        super.visit(node, param);
+        super.visit(node, node);
 
         variables.reset();
         return null;
@@ -123,6 +123,44 @@ public class Identification extends DefaultVisitor {
         return null;
     }
 
+    public Object visit(Assignment node, Object param) {
+        super.visit(node, param);
+
+        if (param instanceof DefFunc)
+            node.setFunDefinition((DefFunc) param);
+
+        return null;
+    }
+
+    public Object visit(IfElse node, Object param) {
+        super.visit(node, param);
+
+        if (param instanceof DefFunc)
+            node.setFunDefinition((DefFunc) param);
+
+        return null;
+    }
+
+    //	class While { Expression expression;  List<Sentence> sentence; }
+    public Object visit(While node, Object param) {
+        super.visit(node, param);
+
+        if (param instanceof DefFunc) {
+            node.setFunDefinition((DefFunc) param);
+        }
+
+        return null;
+    }
+
+    public Object visit(Return node, Object param) {
+        super.visit(node, param);
+
+        if (param instanceof DefFunc) {
+            node.setFunDefinition((DefFunc) param);
+        }
+
+        return null;
+    }
     // Métodos auxiliares recomendados (opcionales) -------------
 
     private void predicado(boolean condition, String errorMessage, Position position) {

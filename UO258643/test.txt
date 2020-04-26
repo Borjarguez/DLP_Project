@@ -1,0 +1,16 @@
+var a:int;
+var b:float;
+var c:char;
+
+ejemplo(par1:float, par2:int) {
+    var local1: float;
+    var local2: float;
+
+    b = 3.4;
+    par1 = 3.4;
+    local2 = 3.4;
+}
+
+main() {
+    ejemplo(1.5, 27);
+}

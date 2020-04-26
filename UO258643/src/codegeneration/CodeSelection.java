@@ -17,29 +17,25 @@ enum CodeFunction {
 
 public class CodeSelection extends DefaultVisitor {
 
-    private Map<String, String> arithmethicInstruction = new HashMap<String, String>();
-    private Map<String, String> comparationInstruction = new HashMap<String, String>();
-    private Map<String, String> logicalInstruction = new HashMap<String, String>();
+    private Map<String, String> instruction = new HashMap<String, String>();
 
     public CodeSelection(Writer writer, String sourceFile) {
         this.writer = new PrintWriter(writer);
         this.sourceFile = sourceFile;
 
-        arithmethicInstruction.put("+", "add");
-        arithmethicInstruction.put("-", "sub");
-        arithmethicInstruction.put("*", "mul");
-        arithmethicInstruction.put("/", "div");
-
-        comparationInstruction.put(">", "gt");
-        comparationInstruction.put("<", "lt");
-        comparationInstruction.put(">=", "ge");
-        comparationInstruction.put("<=", "le");
-
-        logicalInstruction.put("==", "eq");
-        logicalInstruction.put("!=", "ne");
-        logicalInstruction.put("&&", "and");
-        logicalInstruction.put("||", "or");
-        logicalInstruction.put("!", "not");
+        instruction.put("+", "add");
+        instruction.put("-", "sub");
+        instruction.put("*", "mul");
+        instruction.put("/", "div");
+        instruction.put(">", "gt");
+        instruction.put("<", "lt");
+        instruction.put(">=", "ge");
+        instruction.put("<=", "le");
+        instruction.put("==", "eq");
+        instruction.put("!=", "ne");
+        instruction.put("&&", "and");
+        instruction.put("||", "or");
+        instruction.put("!", "not");
     }
 
     public Object visit(Program node, Object param) {
@@ -95,7 +91,24 @@ public class CodeSelection extends DefaultVisitor {
 
     //	class Return { Expression expression; }
     public Object visit(Return node, Object param) {
-        // TODO
+        // Primero, calculo el tamaño de los parámetros
+        int paramsSize = 0;
+        List<DefVariable> listParams = node.getDefFunc().getParams();
+
+        for (DefVariable var : listParams)
+            paramsSize += var.getType().getMemorySize();
+
+        // Segundo, calculo el tamaño del retorno
+        int retSize = node.getExpression().getType().getMemorySize();
+
+        // Tercero, calculo el tamaño de las variables
+        int varsSize = 0;
+        List<DefVariable> listVariables = node.getDefFunc().getDefinitions();
+        for (DefVariable var : listVariables) {
+            varsSize += var.getType().getMemorySize();
+        }
+
+        out("ret " + retSize + "-" + varsSize + "-" + paramsSize);
         return null;
     }
 
@@ -137,7 +150,8 @@ public class CodeSelection extends DefaultVisitor {
 
     //	class FuncSentence { String name;  List<Expression> args; }
     public Object visit(FuncSentence node, Object param) {
-        // TODO
+        visitChildren(node.getArgs(), CodeFunction.VALUE);
+        out("call " + node.getName());
         return null;
     }
 
@@ -149,16 +163,16 @@ public class CodeSelection extends DefaultVisitor {
         assert (param == CodeFunction.VALUE);
         node.getLeft().accept(this, CodeFunction.VALUE);
         node.getRight().accept(this, CodeFunction.VALUE);
-        out(arithmethicInstruction.get(node.getOperator()), node.getType());
+        out(instruction.get(node.getOperator()), node.getType());
         return null;
     }
 
     //	class ComparationExpr { Expression left;  String operator;  Expression right; }
     public Object visit(ComparationExpr node, Object param) {
         assert (param == CodeFunction.VALUE);
-        node.getLeft().accept(this, CodeFunction.VALUE);
         node.getRight().accept(this, CodeFunction.VALUE);
-        out(comparationInstruction.get(node.getOperator()), node.getType());
+        node.getLeft().accept(this, CodeFunction.VALUE);
+        out(instruction.get(node.getOperator()), node.getType());
         return null;
     }
 
@@ -167,7 +181,7 @@ public class CodeSelection extends DefaultVisitor {
         assert (param == CodeFunction.VALUE);
         node.getLeft().accept(this, CodeFunction.VALUE);
         node.getRight().accept(this, CodeFunction.VALUE);
-        out(logicalInstruction.get(node.getOperator()), node.getType());
+        out(instruction.get(node.getOperator()), node.getType());
         return null;
     }
 
@@ -175,7 +189,7 @@ public class CodeSelection extends DefaultVisitor {
     public Object visit(NegationExpr node, Object param) {
         assert (param == CodeFunction.VALUE);
         node.getExpression().accept(this, CodeFunction.VALUE);
-        out(logicalInstruction.get(node.getOperator()));
+        out(instruction.get(node.getOperator()));
         return null;
     }
 
@@ -198,7 +212,7 @@ public class CodeSelection extends DefaultVisitor {
                 node.getExpression().accept(this, param);
                 VarType definition = (VarType) node.getExpression().getType();
                 out("push " + definition.findParam(node.getName()).getAddress());
-                out(arithmethicInstruction.get("+"));
+                out(instruction.get("+"));
             }
         }
         return null;
@@ -214,8 +228,8 @@ public class CodeSelection extends DefaultVisitor {
                 node.getExpr().accept(this, param);
                 node.getIndex().accept(this, CodeFunction.VALUE);
                 out("push " + node.getType().getMemorySize());
-                out(arithmethicInstruction.get("*"));
-                out(arithmethicInstruction.get("+"));
+                out(instruction.get("*"));
+                out(instruction.get("+"));
             }
         }
         return null;
@@ -223,8 +237,7 @@ public class CodeSelection extends DefaultVisitor {
 
     //	class FuncExpr { String name;  List<Expression> args; }
     public Object visit(FuncExpr node, Object param) {
-        for (Expression expr : node.getArgs())
-            expr.accept(this, param);
+        visitChildren(node.getArgs(), CodeFunction.VALUE);
         out("call " + node.getName());
         return null;
     }
