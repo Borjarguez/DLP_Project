@@ -48,7 +48,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class VarDefinition { String name;  Type type; }
+    // class VarDefinition { String name; Type type; }
     public Object visit(DefVariable node, Object param) {
         out("#" + node.getScope().toString() + " " + node.getName() + ":" + node.getType().getMAPLName());
         return null;
@@ -66,9 +66,9 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    // # SENTECES
+    // # SENTENCES
 
-    //	class Assignment { Expression left;  Expression right; }
+    // class Assignment { Expression left; Expression right; }
     public Object visit(Assignment node, Object param) {
         line(node);
         node.getLeft().accept(this, CodeFunction.ADDRESS);
@@ -77,19 +77,41 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class IfElse { Expression expression;  List<Sentence> if_sent;  List<Sentence> else_sent; }
+    // class IfElse { Expression expression; List<Sentence> if_sent; List<Sentence>
+    // else_sent; }
     public Object visit(IfElse node, Object param) {
         // TODO
         return null;
     }
 
-    //	class While { Expression param;  List<Sentence> sentence; }
+    // Esto es la n en la especificación
+    private Stack<Integer> numWhiles = new Stack<>();
+
+    // class While { Expression param; List<Sentence> sentence; }
     public Object visit(While node, Object param) {
-        // TODO
+        line(node); // Linea del inicio del bucle
+
+        int thisWhile = numWhiles.peek(); // Recupero el numero de whiles del programa
+        out("startWhile" + thisWhile + ":"); // Etiqueta while
+        node.getParam().accept(this, param); // Visito los hijos
+
+        out("jz endWhile" + thisWhile); // Salto si la condición es válida
+        numWhiles.push(thisWhile + 1); // Actualizo el numero de bucles en la pila
+
+        for (Sentence whileSentence : node.getSentence()) // Evaluo las sentencias del while
+            whileSentence.accept(this, param);
+
+        int num = numWhiles.pop(); // Recupero el numero de whiles que almacene en la pila, tiene q ser aqui porque
+                                   // el bucle vuelve a empezar en la siguiente instruccion
+        out("jmp startWhile" + thisWhile); // Vuelta al principio del bucle
+        out("endWhile" + thisWhile + ":"); // Final del bucle
+
+        numWhiles.pop(); // Limpio la basura
+        numWhiles.push(num); // Pongo el valor definitivo al salir del bucle
         return null;
     }
 
-    //	class Return { Expression expression; }
+    // class Return { Expression expression; }
     public Object visit(Return node, Object param) {
         // Primero, calculo el tamaño de los parámetros
         int paramsSize = 0;
@@ -104,15 +126,15 @@ public class CodeSelection extends DefaultVisitor {
         // Tercero, calculo el tamaño de las variables
         int varsSize = 0;
         List<DefVariable> listVariables = node.getDefFunc().getDefinitions();
-        for (DefVariable var : listVariables) {
+
+        for (DefVariable var : listVariables)
             varsSize += var.getType().getMemorySize();
-        }
 
         out("ret " + retSize + "-" + varsSize + "-" + paramsSize);
         return null;
     }
 
-    //	class Read { Expression expression; }
+    // class Read { Expression expression; }
     public Object visit(Read node, Object param) {
         line(node);
         super.visit(node, CodeFunction.ADDRESS);
@@ -132,7 +154,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class Println { Expression expression; }
+    // class Println { Expression expression; }
     public Object visit(Println node, Object param) {
         line(node);
         node.getExpression().accept(this, CodeFunction.VALUE);
@@ -140,7 +162,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class Printsp { Expression expression; }
+    // class Printsp { Expression expression; }
     public Object visit(Printsp node, Object param) {
         line(node);
         node.getExpression().accept(this, CodeFunction.VALUE);
@@ -148,7 +170,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class FuncSentence { String name;  List<Expression> args; }
+    // class FuncSentence { String name; List<Expression> args; }
     public Object visit(FuncSentence node, Object param) {
         visitChildren(node.getArgs(), CodeFunction.VALUE);
         out("call " + node.getName());
@@ -167,7 +189,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class ComparationExpr { Expression left;  String operator;  Expression right; }
+    // class ComparationExpr { Expression left; String operator; Expression right; }
     public Object visit(ComparationExpr node, Object param) {
         assert (param == CodeFunction.VALUE);
         node.getRight().accept(this, CodeFunction.VALUE);
@@ -176,7 +198,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class LogicExpr { Expression left;  String operator;  Expression right; }
+    // class LogicExpr { Expression left; String operator; Expression right; }
     public Object visit(LogicExpr node, Object param) {
         assert (param == CodeFunction.VALUE);
         node.getLeft().accept(this, CodeFunction.VALUE);
@@ -185,7 +207,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class NegationExpr { String operator;  Expression expression; }
+    // class NegationExpr { String operator; Expression expression; }
     public Object visit(NegationExpr node, Object param) {
         assert (param == CodeFunction.VALUE);
         node.getExpression().accept(this, CodeFunction.VALUE);
@@ -193,16 +215,15 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class CastExpr { Type type;  Expression expression; }
+    // class CastExpr { Type type; Expression expression; }
     public Object visit(CastExpr node, Object param) {
         assert (param == CodeFunction.VALUE);
         node.getExpression().accept(this, CodeFunction.VALUE);
-        // TODO Corregir, creo q hay un caso excepcional con los enteros
         out(node.getExpression().getType().getSuffix() + "2" + node.getType().getSuffix());
         return null;
     }
 
-    //	class FieldAccess { Expression expression;  String name; }
+    // class FieldAccess { Expression expression; String name; }
     public Object visit(FieldAccess node, Object param) {
         if (param == CodeFunction.VALUE) {
             visit(node, CodeFunction.ADDRESS);
@@ -218,7 +239,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class ArrayCall { Expression index;  Expression expr; }
+    // class ArrayCall { Expression index; Expression expr; }
     public Object visit(ArrayCall node, Object param) {
         if (param == CodeFunction.VALUE) {
             visit(node, CodeFunction.ADDRESS);
@@ -235,7 +256,7 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    //	class FuncExpr { String name;  List<Expression> args; }
+    // class FuncExpr { String name; List<Expression> args; }
     public Object visit(FuncExpr node, Object param) {
         visitChildren(node.getArgs(), CodeFunction.VALUE);
         out("call " + node.getName());
