@@ -77,10 +77,49 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
+    // Esto es la n en la especificación
+    private Stack<Integer> numIfElse = new Stack<>();
+
     // class IfElse { Expression expression; List<Sentence> if_sent; List<Sentence>
     // else_sent; }
     public Object visit(IfElse node, Object param) {
-        // TODO
+        int thisIfElse = 0, num = 0; // Para lelvar el control del numero de ifElse del programa (n en la especificacion)
+        line(node); // Linea del inicio del bucle
+
+        thisIfElse = numIfElse.peek(); // Recupero el numero de ifElses del programa
+        node.getExpression().accept(this, param); // Compruebo la condicion
+
+        // Si no existe clausula else se salta al final del bloque
+        if (node.getElse_sent() != null)
+            out("jz else" + thisIfElse);
+        else
+            out("jz endBlock" + thisIfElse);
+
+        numIfElse.push(num + 1); // Actualizo el valor de la pila
+
+        for (Sentence ifSentence : node.getIf_sent()) // Evaluo las sentencias del if
+            ifSentence.accept(this, param);
+
+        num = numIfElse.pop(); // Limpio basura de la pila
+
+        if (node.getElse_sent() != null) {
+            // Esto evita código muerto
+            out("jmp endBlock" + thisIfElse);
+
+            writer.println(); // espacio en blanco
+            out("else" + thisIfElse + ":"); // comienzo de la etiqueta else
+            numIfElse.push(num + 1);
+
+            for (Sentence sentence : node.getElse_sent())
+                sentence.accept(this, param);
+
+            num = numIfElse.pop(); // Limpio la pila
+        }
+
+        out("endBlock" + thisIfElse + ":"); // Final del bloque
+
+        numIfElse.pop(); // Limpio la basura
+        numIfElse.push(num + 1); // Pongo el valor definitivo al salir del bucle
         return null;
     }
 
@@ -107,7 +146,7 @@ public class CodeSelection extends DefaultVisitor {
         out("endWhile" + thisWhile + ":"); // Final del bucle
 
         numWhiles.pop(); // Limpio la basura
-        numWhiles.push(num); // Pongo el valor definitivo al salir del bucle
+        numWhiles.push(num + 1); // Pongo el valor definitivo al salir del bucle
         return null;
     }
 
@@ -260,6 +299,32 @@ public class CodeSelection extends DefaultVisitor {
     public Object visit(FuncExpr node, Object param) {
         visitChildren(node.getArgs(), CodeFunction.VALUE);
         out("call " + node.getName());
+        return null;
+    }
+
+    //	class IntConstant { String valor; }
+    public Object visit(IntConstant node, Object param) {
+        assert (param == CodeFunction.VALUE);
+        out("push " + node.getValue());
+        return node.getValue();
+    }
+
+    //	class RealConstant { String valor; }
+    public Object visit(RealConstant node, Object param) {
+        assert (param == CodeFunction.VALUE);
+        out("pushf " + node.getValue());
+        return null;
+    }
+
+    //	class CharConstant { String value; }
+    public Object visit(CharConstant node, Object param) {
+        assert (param == CodeFunction.VALUE);
+
+        int code = (int) node.getValue().charAt(0);
+        if (node.getValue().charAt(0) == '\\' && node.getValue().charAt(1) == 'n')
+            code = 10;
+
+        out("pushb " + code);
         return null;
     }
 
