@@ -884,7 +884,7 @@ public class GrammarParser extends Parser {
 				match(T__4);
 				setState(201);
 				((ParamsContext)_localctx).type = type();
-				_localctx.list.add(new DefVariable(((ParamsContext)_localctx).IDENT, ((ParamsContext)_localctx).type.ast, VarScope.LOCAL));
+				_localctx.list.add(new DefVariable(((ParamsContext)_localctx).IDENT, ((ParamsContext)_localctx).type.ast, VarScope.PARAM));
 				setState(211);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -899,7 +899,7 @@ public class GrammarParser extends Parser {
 					match(T__4);
 					setState(206);
 					((ParamsContext)_localctx).type = type();
-					_localctx.list.add(new DefVariable(((ParamsContext)_localctx).IDENT, ((ParamsContext)_localctx).type.ast, VarScope.LOCAL));
+					_localctx.list.add(new DefVariable(((ParamsContext)_localctx).IDENT, ((ParamsContext)_localctx).type.ast, VarScope.PARAM));
 					}
 					}
 					setState(213);

@@ -1,2 +1,4 @@
-# DLP Project
-This is the repo of DLP's final project
+# Diseño de Lenguajes de Programación
+Proyecto de lenguaje de la asignatura Diseño de Lenguajes de Programación de la Escuela de Ingeniería Informática, Universidad de Oviedo.
+
+Profesor asignado: Raúl Izquierdo Castanedo

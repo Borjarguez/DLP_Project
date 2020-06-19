@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ast.*;
+import ast.DefVariable.VarScope;
 import main.*;
 import visitor.*;
 
@@ -33,7 +34,19 @@ public class Identification extends DefaultVisitor {
 
         variables.set();
 
-        super.visit(node, node);
+        // Recorro los parametros
+        for (DefVariable paramm : node.getParams())
+            paramm.accept(this, VarScope.PARAM);
+
+        // Recorro las definiciones de dentro de la funcion
+        for (DefVariable def : node.getDefinitions())
+            def.accept(this, VarScope.LOCAL);
+
+        // Recorro las sentencias
+        for (Sentence sent : node.getSentences())
+            sent.accept(this, node);
+
+        node.getReturnType().accept(this, param);
 
         variables.reset();
         return null;
@@ -53,9 +66,9 @@ public class Identification extends DefaultVisitor {
     public Object visit(FuncExpr node, Object param) {
         super.visit(node, param);
 
+        DefFunc def = funciones.get(node.getName());
         predicado(funciones.get(node.getName()) != null, "ERROR: Function does not exists " + node.getName(), node);
-        node.setDefinition(funciones.get(node.getName()));
-
+        node.setDefinition(def);
         return null;
     }
 
@@ -161,8 +174,8 @@ public class Identification extends DefaultVisitor {
 
         return null;
     }
-    // Métodos auxiliares recomendados (opcionales) -------------
 
+    // Métodos auxiliares recomendados (opcionales) -------------
     private void predicado(boolean condition, String errorMessage, Position position) {
         if (!condition)
             errorManager.notify("Identification", errorMessage, position);

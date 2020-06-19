@@ -26,7 +26,7 @@ import org.antlr.v4.runtime.*;
  * Generación de Código: 'MemoryAllocation.java' y 'CodeSelection.java'.
  */
 public class Main {
-    public static final String program = "test.txt"; // Fichero de prueba durante el desarrollo
+    public static final String program = "prueba.txt"; // Fichero de prueba durante el desarrollo
 
     public static void main(String[] args) throws Exception {
         ErrorManager errorManager = new ErrorManager();
