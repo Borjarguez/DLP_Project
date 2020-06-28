@@ -83,7 +83,7 @@ public class CodeSelection extends DefaultVisitor {
     // class IfElse { Expression expression; List<Sentence> if_sent; List<Sentence>
     // else_sent; }
     public Object visit(IfElse node, Object param) {
-        int thisIfElse = 0, num = 0; // Para lelvar el control del numero de ifElse del programa (n en la especificacion)
+        int thisIfElse = 0, num = 0; // Para llevar el control del numero de ifElse del programa (n en la especificacion)
         line(node); // Linea del inicio del bucle
 
         thisIfElse = numIfElse.peek(); // Recupero el numero de ifElses del programa
