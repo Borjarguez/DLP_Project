@@ -110,7 +110,7 @@ public class TypeChecking extends DefaultVisitor {
         super.visit(node, param);
 
         // Primera comprobación: el numero de parámetros debe ser el de su definición
-        predicado(node.getArgs().size() != node.getDefinition().getParams().size(),
+        predicado(node.getArgs().size() == node.getDefinition().getParams().size(),
                 "ERROR: Numero de parámetros incorrecto", node);
 
         // Segunda comprobación: el tipo de parámetro de la función sea el de su definición
@@ -253,7 +253,6 @@ public class TypeChecking extends DefaultVisitor {
         node.setType(node.getLeft().getType());
         node.setModificable(false);
         return null;
-
     }
 
     //# class ComparationExpr { Expression left; String operator; Expression right; }
@@ -362,7 +361,7 @@ public class TypeChecking extends DefaultVisitor {
 
         // Reglas semánticas
         node.setType(((ArrayType) node.getExpr().getType()).getType());
-        node.setModificable(false);
+        node.setModificable(true);
         return null;
     }
 

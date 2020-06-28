@@ -24,7 +24,6 @@ public class Identification extends DefaultVisitor {
         this.errorManager = errorManager;
     }
 
-    // # --------------------------------------------------------
     // ----------------- FUNCIONES -----------------
 
     //	class DefFunc { String name;  List<DefVariable> args;  Type returnType;  List<DefVariable> definitions;  List<Sentence> sentences; }
