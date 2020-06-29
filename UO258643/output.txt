@@ -1,0 +1,618 @@
+#source "prueba.txt"
+call main
+halt
+
+#GLOBAL pareja:Pareja
+push 2
+#GLOBAL acme:2 * Empresa
+#GLOBAL fibonacci:8 * 3 * int
+#PARAM paramReal:float
+#PARAM paramInt:int
+#LOCAL localReal:float
+#LOCAL digito:char
+#LOCAL resultado:int
+
+#line 30
+pusha BP
+push -4
+add
+pusha BP
+push 6
+add
+loadf
+pushf 10.0
+mulf
+storef
+
+#line 31
+pusha BP
+push -5
+add
+pushb 39
+storeb
+
+#line 37
+push 256
+pusha BP
+push 4
+add
+loadi
+lti
+jz else_0
+
+#line 33
+pusha BP
+push -5
+add
+pusha BP
+push 4
+add
+loadi
+i2b
+storeb
+
+#line 34
+pusha BP
+push -7
+add
+pusha BP
+push -5
+add
+loadb
+b2i
+storei
+jmp endBlock_0
+else_0:
+
+#line 37
+pusha BP
+push -7
+add
+pusha BP
+push -4
+add
+loadf
+f2i
+storei
+endBlock_0:
+ret 2-7-6
+#LOCAL i:int
+
+#line 46
+pusha 11
+push 0
+push 6
+mul
+add
+push 0
+push 2
+mul
+add
+push 0
+storei
+
+#line 47
+pusha 11
+push 0
+push 6
+mul
+add
+push 1
+push 2
+mul
+add
+push 1
+storei
+
+#line 48
+pusha 11
+push 0
+push 6
+mul
+add
+push 2
+push 2
+mul
+add
+push 1
+storei
+
+#line 49
+pusha BP
+push -2
+add
+push 1
+storei
+
+#line 54
+startWhile_0:
+push 8
+pusha BP
+push -2
+add
+loadi
+lti
+jz endWhile_0
+
+#line 51
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 0
+push 2
+mul
+add
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 1
+subi
+push 6
+mul
+add
+push 1
+push 2
+mul
+add
+loadi
+storei
+
+#line 52
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 1
+push 2
+mul
+add
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 1
+subi
+push 6
+mul
+add
+push 2
+push 2
+mul
+add
+loadi
+storei
+
+#line 53
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 2
+push 2
+mul
+add
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 0
+push 2
+mul
+add
+loadi
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 1
+push 2
+mul
+add
+loadi
+addi
+storei
+
+#line 54
+pusha BP
+push -2
+add
+pusha BP
+push -2
+add
+loadi
+push 1
+addi
+storei
+jmp startWhile_0
+endWhile_0:
+#LOCAL i:int
+#LOCAL j:int
+call p
+
+#line 66
+pusha BP
+push -2
+add
+push 0
+storei
+
+#line 67
+pusha 0
+push 2
+add
+pushb 39
+storeb
+
+#line 68
+pusha 0
+push 0
+add
+pushb 39
+b2i
+storei
+
+#line 70
+pusha BP
+push -2
+add
+loadi
+i2f
+pusha 0
+push 2
+add
+loadb
+b2i
+call f
+outi
+pushf 1.3
+push 2
+call f
+call inicializa
+
+#line 74
+pusha BP
+push -2
+add
+push 0
+storei
+
+#line 86
+startWhile_1:
+push 8
+pusha BP
+push -2
+add
+loadi
+lti
+jz endWhile_1
+
+#line 76
+pushb 39
+outb
+
+#line 77
+pusha BP
+push -2
+add
+loadi
+push 1
+addi
+outi
+
+#line 78
+pushb 39
+outb
+
+#line 79
+pushb 39
+outb
+
+#line 80
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 0
+push 2
+mul
+add
+loadi
+outi
+
+#line 81
+pushb 39
+outb
+
+#line 82
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 1
+push 2
+mul
+add
+loadi
+outi
+
+#line 83
+pushb 39
+outb
+
+#line 84
+pusha 11
+pusha BP
+push -2
+add
+loadi
+push 6
+mul
+add
+push 2
+push 2
+mul
+add
+loadi
+outi
+
+#line 85
+pushb 39
+outb
+
+#line 86
+pusha BP
+push -2
+add
+pusha BP
+push -2
+add
+loadi
+push 1
+addi
+storei
+jmp startWhile_1
+endWhile_1:
+
+#line 89
+pusha 3
+push 1
+push 4
+mul
+add
+push 0
+add
+push 1
+push 2
+mul
+add
+push 0
+add
+push 56
+storei
+
+#line 90
+pusha 3
+push 1
+push 4
+mul
+add
+push 0
+add
+push 1
+push 2
+mul
+add
+push 0
+add
+loadi
+outi
+
+#line 92
+pusha BP
+push -2
+add
+push 0
+storei
+
+#line 99
+startWhile_2:
+push 2
+pusha BP
+push -2
+add
+loadi
+lti
+jz endWhile_2
+
+#line 94
+pusha BP
+push -4
+add
+push 0
+storei
+
+#line 97
+startWhile_3:
+push 2
+pusha BP
+push -4
+add
+loadi
+lti
+jz endWhile_3
+
+#line 96
+pusha 3
+pusha BP
+push -2
+add
+loadi
+push 4
+mul
+add
+push 0
+add
+pusha BP
+push -4
+add
+loadi
+push 2
+mul
+add
+push 0
+add
+pusha BP
+push -2
+add
+loadi
+pusha BP
+push -4
+add
+loadi
+addi
+storei
+
+#line 97
+pusha BP
+push -4
+add
+pusha BP
+push -4
+add
+loadi
+push 1
+addi
+storei
+jmp startWhile_3
+endWhile_3:
+
+#line 99
+pusha BP
+push -2
+add
+pusha BP
+push -2
+add
+loadi
+push 1
+addi
+storei
+jmp startWhile_2
+endWhile_2:
+
+#line 103
+pusha BP
+push -2
+add
+push 0
+storei
+
+#line 110
+startWhile_4:
+push 2
+pusha BP
+push -2
+add
+loadi
+lti
+jz endWhile_4
+
+#line 105
+pusha BP
+push -4
+add
+push 0
+storei
+
+#line 108
+startWhile_5:
+push 2
+pusha BP
+push -4
+add
+loadi
+lti
+jz endWhile_5
+
+#line 107
+pusha 3
+pusha BP
+push -2
+add
+loadi
+push 4
+mul
+add
+push 0
+add
+pusha BP
+push -4
+add
+loadi
+push 2
+mul
+add
+push 0
+add
+loadi
+outi
+
+#line 108
+pusha BP
+push -4
+add
+pusha BP
+push -4
+add
+loadi
+push 1
+addi
+storei
+jmp startWhile_5
+endWhile_5:
+
+#line 110
+pusha BP
+push -2
+add
+pusha BP
+push -2
+add
+loadi
+push 1
+addi
+storei
+jmp startWhile_4
+endWhile_4:

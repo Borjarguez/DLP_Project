@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.*;
 
 import ast.*;
+import ast.DefVariable.VarScope;
 import visitor.*;
 
 enum CodeFunction {
@@ -61,7 +62,14 @@ public class CodeSelection extends DefaultVisitor {
             out("load", node.getType());
         } else { // Funcion.DIRECCION
             assert (param == CodeFunction.ADDRESS);
-            out("pusha " + node.getDefinition().getAddress());
+            if (node.getDefinition().getScope().equals(VarScope.GLOBAL)) // Comprobacion variable global
+                out("pusha " + node.getDefinition().getAddress());
+            else {
+                out("pusha BP");
+                out("push " + node.getDefinition().getAddress());
+                out("add");
+            }
+
         }
         return null;
     }
@@ -77,76 +85,55 @@ public class CodeSelection extends DefaultVisitor {
         return null;
     }
 
-    // Esto es la n en la especificación
-    private Stack<Integer> numIfElse = new Stack<>();
+    private int numIfElse = 0;
 
     // class IfElse { Expression expression; List<Sentence> if_sent; List<Sentence>
     // else_sent; }
     public Object visit(IfElse node, Object param) {
-        int thisIfElse = 0, num = 0; // Para llevar el control del numero de ifElse del programa (n en la especificacion)
         line(node); // Linea del inicio del bucle
 
-        thisIfElse = numIfElse.peek(); // Recupero el numero de ifElses del programa
+        int num = numIfElse++; // Para llevar el control del numero de ifElse del programa (n en la especificacion)
         node.getExpression().accept(this, param); // Compruebo la condicion
 
         // Si no existe clausula else se salta al final del bloque
         if (node.getElse_sent() != null)
-            out("jz else" + thisIfElse);
+            out("jz else_" + num);
         else
-            out("jz endBlock" + thisIfElse);
+            out("jz endBlock_" + num);
 
-        numIfElse.push(num + 1); // Actualizo el valor de la pila
+        if (node.getIf_sent() != null)
+            visitChildren(node.getIf_sent(), param); // recorremos las sentencias del bloque if
 
-        for (Sentence ifSentence : node.getIf_sent()) // Evaluo las sentencias del if
-            ifSentence.accept(this, param);
-
-        num = numIfElse.pop(); // Limpio basura de la pila
+        out("jmp endBlock_" + num);
 
         if (node.getElse_sent() != null) {
-            // Esto evita código muerto
-            out("jmp endBlock" + thisIfElse);
-
-            writer.println(); // espacio en blanco
-            out("else" + thisIfElse + ":"); // comienzo de la etiqueta else
-            numIfElse.push(num + 1);
-
-            for (Sentence sentence : node.getElse_sent())
-                sentence.accept(this, param);
-
-            num = numIfElse.pop(); // Limpio la pila
+            out("else_" + num + ":"); // comienzo de la etiqueta else
+            visitChildren(node.getElse_sent(), param); // recorremos las sentencias del bloque else
         }
 
-        out("endBlock" + thisIfElse + ":"); // Final del bloque
-
-        numIfElse.pop(); // Limpio la basura
-        numIfElse.push(num + 1); // Pongo el valor definitivo al salir del bucle
+        out("endBlock_" + num + ":"); // Final del bloque
         return null;
     }
 
     // Esto es la n en la especificación
-    private Stack<Integer> numWhiles = new Stack<>();
+    private int numWhiles = 0;
 
     // class While { Expression param; List<Sentence> sentence; }
     public Object visit(While node, Object param) {
         line(node); // Linea del inicio del bucle
 
-        int thisWhile = numWhiles.peek(); // Recupero el numero de whiles del programa
-        out("startWhile" + thisWhile + ":"); // Etiqueta while
+        int num = numWhiles++; // Recupero el numero de whiles del programa
+        out("startWhile_" + num + ":"); // Etiqueta while
         node.getParam().accept(this, param); // Visito los hijos
 
-        out("jz endWhile" + thisWhile); // Salto si la condición es válida
-        numWhiles.push(thisWhile + 1); // Actualizo el numero de bucles en la pila
+        out("jz endWhile_" + num); // Salto si la condición es válida
 
-        for (Sentence whileSentence : node.getSentence()) // Evaluo las sentencias del while
-            whileSentence.accept(this, param);
+        if (node.getSentence() != null)
+            visitChildren(node.getSentence(), param);
 
-        int num = numWhiles.pop(); // Recupero el numero de whiles que almacene en la pila, tiene q ser aqui porque
-                                   // el bucle vuelve a empezar en la siguiente instruccion
-        out("jmp startWhile" + thisWhile); // Vuelta al principio del bucle
-        out("endWhile" + thisWhile + ":"); // Final del bucle
+        out("jmp startWhile_" + num); // Vuelta al principio del bucle
+        out("endWhile_" + num + ":"); // Final del bucle
 
-        numWhiles.pop(); // Limpio la basura
-        numWhiles.push(num + 1); // Pongo el valor definitivo al salir del bucle
         return null;
     }
 
@@ -282,7 +269,7 @@ public class CodeSelection extends DefaultVisitor {
     public Object visit(ArrayCall node, Object param) {
         if (param == CodeFunction.VALUE) {
             visit(node, CodeFunction.ADDRESS);
-            out("load", node.getTipoArray());
+            out("load", node.getType());
         } else {
             if (param == CodeFunction.ADDRESS) {
                 node.getExpr().accept(this, param);

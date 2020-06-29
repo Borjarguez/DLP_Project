@@ -77,11 +77,11 @@ main(){
     print i + 1;
     print ')';
     print ' ';
-    //print fibonacci[i][0];
+    print fibonacci[i][0];
     print '+';
-    //print fibonacci[i][1];
+    print fibonacci[i][1];
     print '=';
-    //print fibonacci[i][2];
+    print fibonacci[i][2];
     print '\n';
     i = i + 1;
   }
