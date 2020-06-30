@@ -25,7 +25,7 @@ public class TypeChecking extends DefaultVisitor {
         this.errorManager = errorManager;
     }
 
-    //# class DefVariable { String name; Type type; }
+    // class DefVariable { String name; Type type; }
     public Object visit(DefVariable node, Object param) {
         super.visit(node, param);
 
@@ -35,8 +35,8 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class DefFunc { String name; List<DefVariable> params; Type returnType;
-    //# List<DefVariable> definitions; List<Sentence> sentences; }
+    // class DefFunc { String name; List<DefVariable> params; Type returnType;
+    // List<DefVariable> definitions; List<Sentence> sentences; }
     public Object visit(DefFunc node, Object param) {
         super.visit(node, param);
 
@@ -46,7 +46,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class Assignment { Expression left; Expression right; }
+    // class Assignment { Expression left; Expression right; }
     public Object visit(Assignment node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -65,7 +65,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //#	class IfElse { Expression expression;  List<Sentence> if_sent;  List<Sentence> else_sent; }
+    //	class IfElse { Expression expression;  List<Sentence> if_sent;  List<Sentence> else_sent; }
     public Object visit(IfElse node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -77,7 +77,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //#	class While { Expression param;  List<Sentence> sentence; }
+    //	class While { Expression param;  List<Sentence> sentence; }
     public Object visit(While node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -89,7 +89,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class Return { Expression expression; }
+    // class Return { Expression expression; }
     public Object visit(Return node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -105,7 +105,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //#	class FuncExpr { String name;  List<Expression> args; }
+    //	class FuncExpr { String name;  List<Expression> args; }
     public Object visit(FuncExpr node, Object param) {
         super.visit(node, param);
 
@@ -125,7 +125,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //#	class Read { Expression expression; }
+    //	class Read { Expression expression; }
     public Object visit(Read node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -141,7 +141,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class Print { Expression expression; }
+    // class Print { Expression expression; }
     public Object visit(Print node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -156,7 +156,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class Println { Expression expression; }
+    // class Println { Expression expression; }
     public Object visit(Println node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -170,7 +170,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class Printsp { Expression expression; }
+    // class Printsp { Expression expression; }
     public Object visit(Printsp node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -182,7 +182,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class FuncSentence { String name; List<Expression> args; }
+    // class FuncSentence { String name; List<Expression> args; }
     public Object visit(FuncSentence node, Object param) {
         super.visit(node, param);
 
@@ -200,14 +200,14 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class Variable { String name; }
+    // class Variable { String name; }
     public Object visit(Variable node, Object param) {
         node.setType(node.getDefinition().getType());
         node.setModificable(true);
         return null;
     }
 
-    //# class FieldAccess { Expression expression; String name; }
+    // class FieldAccess { Expression expression; String name; }
     public Object visit(FieldAccess node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -237,7 +237,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class ArithmeticExpr { Expression left; String operator; Expression right; }
+    // class ArithmeticExpr { Expression left; String operator; Expression right; }
     public Object visit(ArithmeticExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -255,7 +255,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class ComparationExpr { Expression left; String operator; Expression right; }
+    // class ComparationExpr { Expression left; String operator; Expression right; }
     public Object visit(ComparationExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -273,7 +273,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class LogicExpr { Expression left; String operator; Expression right; }
+    // class LogicExpr { Expression left; String operator; Expression right; }
     public Object visit(LogicExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -291,7 +291,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# Expresion de negación ('!')
+    // Expresion de negación ('!')
     // class NegationExpr { String operator; Expression expression; }
     public Object visit(NegationExpr node, Object param) {
         // Recorrido de los hijos
@@ -305,7 +305,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class CastExpr { Type type; Expression expression; }
+    // class CastExpr { Type type; Expression expression; }
     public Object visit(CastExpr node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -333,7 +333,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class ArrayCall { Expression index; Expression expr; }
+    // class ArrayCall { Expression index; Expression expr; }
     public Object visit(ArrayCall node, Object param) {
         // Recorrido de los hijos
         super.visit(node, param);
@@ -365,21 +365,21 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class IntConstant { String valor; }
+    // class IntConstant { String valor; }
     public Object visit(IntConstant node, Object param) {
         node.setType(new IntType());
         node.setModificable(false);
         return null;
     }
 
-    //# class RealConstant { String valor; }
+    // class RealConstant { String valor; }
     public Object visit(RealConstant node, Object param) {
         node.setType(new RealType());
         node.setModificable(false);
         return null;
     }
 
-    //#	class CharConstant { String value; }
+    //	class CharConstant { String value; }
     public Object visit(CharConstant node, Object param) {
         node.setType(new CharType());
         node.setModificable(false);
@@ -387,7 +387,7 @@ public class TypeChecking extends DefaultVisitor {
         return null;
     }
 
-    //# class VoidConstant { }
+    // class VoidConstant { }
     public Object visit(VoidConstant node, Object param) {
         node.setType(new VoidType());
         node.setModificable(false);
